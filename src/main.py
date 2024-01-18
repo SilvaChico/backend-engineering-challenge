@@ -6,7 +6,6 @@ from pprint import pprint
 
 
 def calculate_average(numbers):
-    # remove zero from list
     non_zeros = [x for x in numbers if x != 0]
     if len(non_zeros) == 0:
         return 0
@@ -27,21 +26,21 @@ def get_durantion_last_minute(events, current_time):
     return durations_last_minute
 
 
-def get_events(events_strings):
-    """Convert the timestamps to datetime objects"""
+def format_events(events_strings):
+    """Convert the timestamps to datetime objects and the durations to integers"""
     return [
         {
             "timestamp": datetime.datetime.strptime(
                 event_string["timestamp"], "%Y-%m-%d %H:%M:%S.%f"
             ),
-            "duration": event_string["duration"],
+            "duration": int(event_string["duration"]),
         }
         for event_string in events_strings
     ]
 
 
 def calculate_average_delivery_times(window, events_strings):
-    events = get_events(events_strings)
+    events = format_events(events_strings)
 
     start_time = events[0]["timestamp"].replace(second=0, microsecond=0)
     end_time = events[-1]["timestamp"] + datetime.timedelta(minutes=1)
@@ -60,14 +59,13 @@ def calculate_average_delivery_times(window, events_strings):
         )
 
         current_time += datetime.timedelta(minutes=1)
+
     return average_delivery_times
 
 
 def main():
-    # Create the parser
     parser = argparse.ArgumentParser()
 
-    # Add the arguments
     parser.add_argument(
         "--input_file", type=str, required=True, help="The path to the input JSON file"
     )
@@ -75,22 +73,20 @@ def main():
         "--window_size", type=int, required=True, help="The window size"
     )
 
-    # Parse the arguments
     args = parser.parse_args()
 
-    # Get the window size and input file
     window_size = args.window_size
     input_file = args.input_file
 
-    # Load the events from the input file
     with open(input_file, "r") as f:
         events_strings = json.load(f)
 
     average_delivery_times = calculate_average_delivery_times(
         window_size, events_strings
     )
-    for time in average_delivery_times:
-        print(time)
+
+    with open("output.json", "w") as f:
+        json.dump(average_delivery_times, f)
 
 
 if __name__ == "__main__":
