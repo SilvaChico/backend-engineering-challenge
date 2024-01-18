@@ -2,6 +2,7 @@ import datetime
 from collections import deque
 import argparse
 import json
+from pprint import pprint
 
 
 def calculate_average(numbers):
@@ -39,27 +40,27 @@ def get_events(events_strings):
     ]
 
 
-def print_average_delivery_time(window, events_strings):
+def calculate_average_delivery_times(window, events_strings):
     events = get_events(events_strings)
 
     start_time = events[0]["timestamp"].replace(second=0, microsecond=0)
     end_time = events[-1]["timestamp"] + datetime.timedelta(minutes=1)
 
-    # holds the last 'window' number of minutes
     event_queue = deque([0] * (window))
 
-    # runs for every minute
+    average_delivery_times = []
     current_time = start_time
     while current_time <= end_time:
         durations_last_minute = get_durantion_last_minute(events, current_time)
         event_queue.append(durations_last_minute)
         event_queue.popleft()
 
-        print(
+        average_delivery_times.append(
             f"{{\"date\": \"{current_time.strftime('%Y-%m-%d %H:%M:%S')}\", \"average_delivery_time\": {calculate_average(event_queue)}}}"
         )
 
         current_time += datetime.timedelta(minutes=1)
+    return average_delivery_times
 
 
 def main():
@@ -85,7 +86,11 @@ def main():
     with open(input_file, "r") as f:
         events_strings = json.load(f)
 
-    print_average_delivery_time(window_size, events_strings)
+    average_delivery_times = calculate_average_delivery_times(
+        window_size, events_strings
+    )
+    for time in average_delivery_times:
+        print(time)
 
 
 if __name__ == "__main__":
