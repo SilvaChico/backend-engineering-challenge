@@ -100,7 +100,6 @@ def main():
         json.dump(average_delivery_times, f)
 
     print("The average delivery times can be found in output.json")
-    print(average_delivery_times)
 
 
 if __name__ == "__main__":
