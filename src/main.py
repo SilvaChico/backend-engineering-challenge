@@ -2,7 +2,6 @@ import datetime
 from collections import deque
 import argparse
 import json
-from pprint import pprint
 
 
 def calculate_average(numbers):
