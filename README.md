@@ -16,7 +16,7 @@ Check output.json for the output file
 ### Test:
 
 ```
-python3 -m unittest tests/main.py
+python3 -m unittest tests/test_main.py
 ```
 
 ## Assumptions

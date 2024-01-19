@@ -1,2 +1,5 @@
 events.json
 output.json
+src/__pycache__
+*.pyc
+
