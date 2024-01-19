@@ -12,50 +12,46 @@ def calculate_average(numbers):
     return sum(non_zeros) / len(non_zeros)
 
 
-# This assumes that we can have more than one event in a minute
-def get_durantion_last_minute(events, current_time):
-    durations_last_minute = 0
-    for event in events:
-        if (
-            current_time - datetime.timedelta(minutes=1)
-            <= event["timestamp"]
-            < current_time
-        ):
-            durations_last_minute += event["duration"]
-
-    return durations_last_minute
+def convert_to_datetime(timestamp):
+    return datetime.datetime.strptime(timestamp, "%Y-%m-%d %H:%M:%S.%f")
 
 
 def format_events(events_strings):
-    """Convert the timestamps to datetime objects and the durations to integers"""
-    return [
-        {
-            "timestamp": datetime.datetime.strptime(
-                event_string["timestamp"], "%Y-%m-%d %H:%M:%S.%f"
-            ),
-            "duration": int(event_string["duration"]),
-        }
-        for event_string in events_strings
-    ]
+    """Convert the timestamps to datetime objects and the durations to integers and puts the into a dict"""
+    formated_events = {}
+    for event in events_strings:
+        event_minute = convert_to_datetime(event["timestamp"]).replace(
+            second=0, microsecond=0
+        ) + datetime.timedelta(minutes=1)
+        formated_events[event_minute] = formated_events.get(event_minute, 0) + int(
+            event["duration"]
+        )
+    return formated_events
 
 
 def calculate_average_delivery_times(window, events_strings):
-    events = format_events(events_strings)
-
-    start_time = events[0]["timestamp"].replace(second=0, microsecond=0)
-    end_time = events[-1]["timestamp"] + datetime.timedelta(minutes=1)
+    start_time = convert_to_datetime(events_strings[0]["timestamp"]).replace(
+        second=0, microsecond=0
+    )
+    end_time = convert_to_datetime(
+        events_strings[-1]["timestamp"]
+    ) + datetime.timedelta(minutes=1)
 
     event_queue = deque([0] * (window))
 
+    events = format_events(events_strings)
     average_delivery_times = []
     current_time = start_time
     while current_time <= end_time:
-        durations_last_minute = get_durantion_last_minute(events, current_time)
-        event_queue.append(durations_last_minute)
-        event_queue.popleft()
+        durations_last_minute = events.get(current_time, 0)
+        event_queue.appendleft(durations_last_minute)
+        event_queue.pop()
 
         average_delivery_times.append(
-            f"{{\"date\": \"{current_time.strftime('%Y-%m-%d %H:%M:%S')}\", \"average_delivery_time\": {calculate_average(event_queue)}}}"
+            {
+                "date": current_time.strftime("%Y-%m-%d %H:%M:%S"),
+                "average_delivery_time": calculate_average(event_queue),
+            }
         )
 
         current_time += datetime.timedelta(minutes=1)
@@ -87,6 +83,8 @@ def main():
 
     with open("output.json", "w") as f:
         json.dump(average_delivery_times, f)
+
+    print("The average delivery times can be found in output.json")
 
 
 if __name__ == "__main__":
