@@ -1,9 +1,28 @@
 # Backend Engineering Challenge
 
+## Run CLI:
+
+Make sure you have python installed on your machine:
+[Install python](https://www.python.org/downloads/)
+
+### Run:
+
+```
+python src/main.py --input_file <file.json> --window_size <size of window>
+```
+
+Check output.json for the output file
+
+### Test:
+
+```
+python3 -m unittest tests/main.py
+```
+
 ## Assumptions
 
 - Several events can occur in the course of one minute
-- input format will be in the JSON format like so:
+- Input format will be in the JSON format like so:
 
 ```json
 [
