@@ -16,7 +16,7 @@ def convert_to_datetime(timestamp):
 
 
 def format_events(events_strings):
-    """Convert the timestamps to datetime objects and the durations to integers and puts the into a dict"""
+    # convert the timestamps to datetime objects and the durations to integers and puts the into a dict
     formated_events = {}
     for event in events_strings:
         event_minute = convert_to_datetime(event["timestamp"]).replace(
@@ -36,13 +36,16 @@ def calculate_average_delivery_times(window, events_strings):
         events_strings[-1]["timestamp"]
     ) + datetime.timedelta(minutes=1)
 
+    # creates a queue with the size of the window
     event_queue = deque([0] * (window))
 
     events = format_events(events_strings)
     average_delivery_times = []
     current_time = start_time
     while current_time <= end_time:
+        # gets the duration of the events in the last minute
         durations_last_minute = events.get(current_time, 0)
+        # adds the duration to the queue
         event_queue.appendleft(durations_last_minute)
         event_queue.pop()
 
