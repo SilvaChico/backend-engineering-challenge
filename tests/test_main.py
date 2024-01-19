@@ -19,20 +19,15 @@ class TestMainFunctions(unittest.TestCase):
         self.assertEqual(calculate_average([0, 0, 0]), 0)
 
     def test_convert_to_datetime(self):
-        timestamp = "2020-01-01 00:00:00.000"
-        self.assertEqual(convert_to_datetime(timestamp), datetime(2020, 1, 1, 0, 0))
+        timestamp = "2020-01-01 00:00:00.123"
+        self.assertEqual(
+            convert_to_datetime(timestamp), datetime(2020, 1, 1, 0, 0, 0, 123000)
+        )
 
     def test_convert_to_datetime_invalid_timestamp(self):
         timestamp = "2020-01-01 00:00:00"
         with self.assertRaises(ValueError):
             convert_to_datetime(timestamp)
-
-    def test_convert_to_datetime_with_milliseconds(self):
-        timestamp = "2020-01-01 00:00:00.123"
-        self.assertEqual(
-            convert_to_datetime(timestamp),
-            datetime(2020, 1, 1, 0, 0, 0, 123000),
-        )
 
     def test_format_events(self):
         events_strings = [
@@ -83,24 +78,26 @@ class TestMainFunctions(unittest.TestCase):
             calculate_average_delivery_times(window, events_strings), expected
         )
 
-    def test_calculate_average_delivery_times_with_10k_events(self):
+    def test_calculate_average_delivery_times_with_big_ammount_of_event(self):
         base_timestamp = datetime.strptime(
             "2020-01-01 00:01:15.000", "%Y-%m-%d %H:%M:%S.%f"
         )
         events_strings = []
 
-        for i in range(10000):
-            timestamp = base_timestamp + timedelta(minutes=i)
-            duration = 50
-            event = {
-                "timestamp": timestamp.strftime("%Y-%m-%d %H:%M:%S.%f"),
-                "duration": duration,
+        events_strings = [
+            {
+                "timestamp": (base_timestamp + timedelta(minutes=i)).strftime(
+                    "%Y-%m-%d %H:%M:%S.%f"
+                ),
+                "duration": 50,
             }
-            events_strings.append(event)
+            for i in range(10000)
+        ]
         window = 10
 
         # except for the first minute, the average delivery time should be 50
         # because the duration is always 50
+
         any_index = 1321
         self.assertEqual(
             calculate_average_delivery_times(window, events_strings)[any_index][

@@ -18,7 +18,7 @@ def convert_to_datetime(timestamp):
 
 
 def format_events(events_strings):
-    """Formats the events into a dict with the minute as the key and the duration as the value"""
+    """Formats the events into a dict with the minute as the key and the total duration as the value"""
     formated_events = {}
     for event in events_strings:
         event_minute = convert_to_datetime(event["timestamp"]).replace(
