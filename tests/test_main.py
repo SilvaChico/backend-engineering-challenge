@@ -147,7 +147,7 @@ class TestMainFunctions(unittest.TestCase):
         # delete the temporary file
         os.remove("tests/temp_input.json")
 
-    def test_main_with_window_0(self):
+    def test_main_with_window_zero(self):
         # create an temporary file
         with open("tests/temp_input.json", "w") as f:
             f.write(
