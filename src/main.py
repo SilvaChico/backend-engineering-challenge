@@ -31,7 +31,7 @@ def format_events(events_strings):
 
 
 def calculate_average_delivery_times(window, events_strings):
-    """Calculates the average delivery times for each minute in the window"""
+    """Calculates the average delivery times for each minute"""
     start_time = convert_to_datetime(events_strings[0]["timestamp"]).replace(
         second=0, microsecond=0
     )
